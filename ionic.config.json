@@ -1,5 +1,7 @@
 {
   "name": "EJE03-GMLYEOB",
-  "integrations": {},
+  "integrations": {
+    "capacitor": {}
+  },
   "type": "angular"
 }
