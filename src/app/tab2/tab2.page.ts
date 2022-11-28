@@ -1,3 +1,4 @@
+import { NavigationEnd, Router } from '@angular/router';
 import { Task, TasksService } from './../services/tasks.service';
 
 import { Component } from '@angular/core';
@@ -10,11 +11,22 @@ import { TasksCompletedService } from './../services/tasks-completed.service';
 })
 export class Tab2Page {
   public tasks: Task[] = [];
-  public tasksC: Task[] = [];
 
   constructor(
-    private TasksCompletedService: TasksCompletedService
+    private TasksCompletedService: TasksCompletedService,
+    private router: Router
   ) {
+    router.events.subscribe((e) => {
+      if (e instanceof NavigationEnd) {
+        if (e.url.endsWith('tab2')) {
+          this.getTasks();
+        }
+      }
+    });
+  }
+
+  private getTasks() {
+    this.tasks = [];
     this.TasksCompletedService.getTasks().subscribe((query) => {
       query.docs.forEach((doc) => {
         const task = doc.data();

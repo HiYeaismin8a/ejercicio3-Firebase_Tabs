@@ -1,3 +1,4 @@
+import { NavigationEnd, Router } from '@angular/router';
 import { Task, TasksService } from '../services/tasks.service';
 
 import { Component } from '@angular/core';
@@ -14,9 +15,16 @@ export class Tab1Page {
 
   constructor(
     private taskService: TasksService,
-    private TasksCompletedService: TasksCompletedService
+    private TasksCompletedService: TasksCompletedService,
+    private router: Router
   ) {
-    this.getTasks();
+    router.events.subscribe((e) => {
+      if (e instanceof NavigationEnd) {
+        if (e.url.endsWith('tab1')) {
+          this.getTasks();
+        }
+      }
+    });
   }
 
   private getTasks() {
