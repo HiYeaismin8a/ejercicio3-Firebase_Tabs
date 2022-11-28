@@ -1,39 +1,63 @@
-import { TasksCompletedService } from './../services/tasks-completed.service';
+import { Task, TasksService } from '../services/tasks.service';
+
 import { Component } from '@angular/core';
-import { TasksService } from '../services/tasks.service';
+import { TasksCompletedService } from './../services/tasks-completed.service';
 
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
-  styleUrls: ['tab1.page.scss']
+  styleUrls: ['tab1.page.scss'],
 })
-
 export class Tab1Page {
+  public tasks: Task[] = [];
+  public task: Task = { task: '' };
 
-  public tasks: string[];
-  public tasksC: string[];
-  public task: string;
-
-  constructor(private taskService:TasksService,private TasksCompletedService:TasksCompletedService) {
-    this.tasks = this.taskService.getTasks();
-    this.tasksC=this.TasksCompletedService.getTasks();
-    this.task = "algo"
+  constructor(
+    private taskService: TasksService,
+    private TasksCompletedService: TasksCompletedService
+  ) {
+    this.getTasks();
   }
 
-  public addTask(){
-    this.taskService.addTasks(this.task);
-    this.tasks=this.taskService.getTasks();
-    console.log(this.tasks)
-    this.task = "";
+  private getTasks() {
+    this.tasks = [];
+    this.taskService.getTasks().subscribe((query) => {
+      query.docs.forEach((doc) => {
+        const task = doc.data();
+        task.id = doc.id;
+        this.tasks.push(task);
+      });
+    });
   }
 
-  public removeTask(pos:number){
-    this.taskService.removeTask(pos);
-    this.tasks = this.taskService.getTasks();
+  public addTask() {
+    this.taskService
+      .addTasks(this.task)
+      .then(() => {
+        this.task.task = '';
+        this.getTasks();
+      })
+      .catch((e) => console.log(e));
   }
-  public CompleteTask(pos:number){
-    this.TasksCompletedService.addTasks(this.tasks[pos]);
-    this.taskService.removeTask(pos);
-    this.tasks = this.taskService.getTasks();
+
+  public removeTask(id: string) {
+    this.taskService
+      .removeTask(id)
+      .then(() => {
+        this.getTasks();
+      })
+      .catch((e) => console.log(e));
+  }
+  public CompleteTask(task: Task) {
+    this.TasksCompletedService.addTasks(task)
+      .then(() => {
+        this.taskService
+          .removeTask(task.id)
+          .then(() => {
+            this.getTasks();
+          })
+          .catch((e) => console.log(e));
+      })
+      .catch((e) => console.log(e));
   }
 }

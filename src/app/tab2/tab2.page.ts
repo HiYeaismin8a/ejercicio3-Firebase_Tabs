@@ -1,26 +1,26 @@
-import { TasksService } from './../services/tasks.service';
-import { TasksCompletedService } from './../services/tasks-completed.service';
+import { Task, TasksService } from './../services/tasks.service';
+
 import { Component } from '@angular/core';
+import { TasksCompletedService } from './../services/tasks-completed.service';
+
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
 })
 export class Tab2Page {
-  public tasks: string[];
-  public tasksC: string[];
+  public tasks: Task[] = [];
+  public tasksC: Task[] = [];
 
   constructor(
-    private taskService: TasksService,
     private TasksCompletedService: TasksCompletedService
   ) {
-    this.tasks = this.taskService.returnTaskC();
-  }
-
-  public CompleteTask(pos: number) {
-    this.taskService.addTasks(this.tasks[pos]);
-    this.TasksCompletedService.removeTask(pos);
-
-    this.tasks = this.taskService.returnTaskC();
+    this.TasksCompletedService.getTasks().subscribe((query) => {
+      query.docs.forEach((doc) => {
+        const task = doc.data();
+        task.id = doc.id;
+        this.tasks.push(task);
+      });
+    });
   }
 }

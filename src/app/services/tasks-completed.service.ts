@@ -1,25 +1,22 @@
-import { TasksService } from './tasks.service';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Injectable } from '@angular/core';
+import { Task } from './tasks.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TasksCompletedService {
-  public tasksCompleted: string[] = [];
+  constructor(private firebase: AngularFirestore) {}
 
-  constructor(private TasksService: TasksService) {
-    this.tasksCompleted = TasksService.returnTaskC();
+  public getTasks() {
+    return this.firebase.collection<Task>('tasks_completed').get();
   }
 
-  public getTasks(): string[] {
-    return this.tasksCompleted;
+  public addTasks(task: Task) {
+    return this.firebase.collection<Task>('tasks_completed').add(task)
   }
 
-  public addTasks(task: string) {
-    this.tasksCompleted.push(task);
-  }
-
-  public removeTask(pos: number) {
-    this.tasksCompleted.splice(pos, 1);
+  public removeTask(id: string) {
+    return this.firebase.collection<Task>('tasks_completed').doc(id).delete()
   }
 }
